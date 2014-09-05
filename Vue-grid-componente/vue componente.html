@@ -1,106 +1,70 @@
 <!doctype html>
-<html>
+<html lang="pt-BR">
 <head>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/0.10.6/vue.min.js"></script>
-    <link   rel="stylesheet" href="grid.css"> <!-- custom styles -->
+<meta charset="UTF-8"/>
+    <script src="vue.min.js"></script>
+    <link   rel="stylesheet" href="grid.css">
+    <script src="d-grid.js"></script>
 </head>
 <body>
+    <div id="demo">
+        <table v-component="d-grid" v-with="$data"></table>
+    </div>
 
+    <br><br>
 
-
-<div id="demo">
-    <table v-component="grid" v-with="gridOptions"></table>
-</div>
-
-<br><br>
-
-<div id="demo2">
-    <table v-component="grid" v-with="gridOptions"></table>
-</div>
-
-
-
-<script type="text/x-template" id="grid-template">
-    <table>
-        <thead>
-            <tr>
-                <th v-repeat="columns" v-on="click:drag(key)">{{header}}</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-repeat="data">
-                <!-- access outer loops data using $parent -->
-                <td v-repeat="columns" v-on="click:clickOnCell(key, $parent[key])">{{$parent[key]}}</td>
-            </tr>
-        </tbody>
-    </table>
-</script>
-
+    <div id="ControlaComponente2">
+        <table v-component="d-grid" v-with="$data"></table>
+    </div>
 
 <script>
-Vue.component('grid', {
-    template: '#grid-template',
-    replace: true,
-    created: function () {
-        this.ascending = {}
-    },
-    methods: {
-        sortBy: function (key) {
-            var asc = this.ascending[key] = !this.ascending[key]
-            this.data.sort(function (a, b) {
-                var res = a[key] > b[key]
-                if (asc) res = !res
-                return res ? 1 : -1
-            })
-        }
-    }
-});
+var lista1 = [{ name: 'Chuck Norris', power: 9999, age: 10 },
+              { name: 'Bruce Lee'   , power: 9000, age: 20 },
+              { name: 'Jacky Chang' , power: 7000, age: 30 },
+              { name: 'Jet Li'      , power: 8000, age:45 }];
 
-var lista1 = [
-    { name: 'Chuck Norris', power: Infinity, age: 10 },
-    { name: 'Bruce Lee'   , power: 9000,     age: 20 },
-    { name: 'Jacky Chang' , power: 7000,     age: 30 },
-    { name: 'Jet Li'      , power: 8000,     age:45 }
-];
-var lista2 = [
-    { nerd: 'Dhiego' , age: 24 },
-    { nerd: 'Nei'    , age: 30 },
-    { nerd: 'Flayner', age: 42 }
-];
+var colunasListadas = [{ header: 'Nome',  key: 'name'   },
+                       { header: 'Poder', key: 'power'  },
+                       { header: 'Idade', key: 'age'    }];
 
-
-// criando a grid baseada no componente criado
+//cria um controller
 new Vue({
     el: '#demo',
-    data: {
-        gridOptions: {
-            data: lista1,
-            columns: [
-                { header: 'Nome',  key: 'name'   },
-                { header: 'Poder', key: 'power'  },
-                { header: 'Idade', key: 'age'    }
-            ],
-            clickOnCell: function(coluna, valor) {
-                this.data.push({name: "Dhiego", power: 454545, age: "12"});
-                alert('Coluna=' + coluna + ' / valor=' + valor)
-            },
-            drag: function(key){
-                this.columns.push({header: 'Add', key: 'name'});
-            }
+    data: { // data é acessível fora do componente
+        data: lista1,
+        columns: colunasListadas,
+        titulo: 'Experimente: Mover colunas, Clicar nas células e clicar no título da coluna',
+
+        clickOnCell: function(coluna, registro) {
+            alert('Coluna=' + coluna.key + ' / valor=' + registro[coluna.key]);
+            this.data.push({name: "Dhiego", power: "Infinito", age: "12"});
+        },
+        processo: function(){
+            var h = 'Col ' + (this.columns.length + 1);
+            this.columns.push({header: h, key: 'name'});
         }
     }
 });
 
-// criando a grid baseada no componente criado
+
+var lista2 = [
+    { nerd: 'Dhiego' , age: 24, endereco: 'Celestino José Capelatto n32'},
+    { nerd: 'Nei'    , age: 30, endereco: 'Endereço Nei n 4878 ap 45'},
+    { nerd: 'Flayner', age: 42, endereco: 'Asilo Veio cai morto. Quartinho 2'}];
+
+var colunasListadas2 = [{ header: 'Nerd' ,    key: 'nerd'    },
+                        { header: 'Idade',    key: 'age'     },
+                        { header: 'Endereço', key: 'endereco'}];
+
 new Vue({
-    el: '#demo2',
+    el: '#ControlaComponente2',
     data: {
-        gridOptions: {
-            data: lista2,
-            columns: [
-                { header: 'Nerd' , key: 'nerd' },
-                { header: 'Idade', key: 'age'  }
-            ]
+        data: lista2,
+        titulo: 'Experiment: mover colunas. OPS, não implementei clickOnCell',
+        columns: colunasListadas2,
+
+        processo: function(){
+            alert('Quantidade de registros na grid: ' + this.data.length);
         }
     }
 });
